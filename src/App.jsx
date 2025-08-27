@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import Header from "./Components/layout/Header";
 import Lower from "./Components/layout/Lower";
 import HomePage from "./Pages/HomePage";
@@ -8,7 +8,7 @@ import AdminPage from "./Pages/AdminPage";
 
 const App = () => {
   return (
-      <BrowserRouter>
+      <HashRouter>
           <div className="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased">
               <Header />
               <Lower>
@@ -19,7 +19,7 @@ const App = () => {
                   </Routes>
               </Lower>
           </div>
-      </BrowserRouter>
+      </HashRouter>
   );
 }
 
