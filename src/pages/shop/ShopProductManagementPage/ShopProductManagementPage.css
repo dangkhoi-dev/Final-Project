@@ -1,0 +1,94 @@
+/* ShopProductManagementPage Styles */
+.shop-product-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.shop-product-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 1.5rem;
+}
+
+.shop-product-table-container {
+  background-color: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.shop-product-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-header {
+  padding: 0.75rem 1.25rem;
+  border-bottom: 2px solid #e5e7eb;
+  background-color: #f3f4f6;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.table-row {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.table-cell {
+  padding: 1.25rem;
+  background-color: white;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.table-actions {
+  text-align: right;
+}
+
+.edit-button {
+  color: #4f46e5;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+  margin-right: 1rem;
+  transition: color 0.15s ease-in-out;
+}
+
+.edit-button:hover {
+  color: #3730a3;
+}
+
+.delete-button {
+  color: #dc2626;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: color 0.15s ease-in-out;
+}
+
+.delete-button:hover {
+  color: #b91c1c;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .shop-product-table-container {
+    overflow-x: auto;
+  }
+  
+  .shop-product-table {
+    min-width: 500px;
+  }
+}
