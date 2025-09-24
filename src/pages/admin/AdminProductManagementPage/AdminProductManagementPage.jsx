@@ -1,9 +1,11 @@
 import React, { useState, useMemo } from 'react';
+import { useNotificationBell } from '../../../contexts/NotificationBellContext';
 import { useAppContext } from '../../../contexts/AppContext';
 import { useNotification } from '../../../contexts/NotificationContext';
 
 const AdminProductManagementPage = () => {
   const { allProducts, setProducts, shops } = useAppContext();
+  const { addNotification } = useNotificationBell();
   const { showSuccess, showError } = useNotification();
   const [filterStatus, setFilterStatus] = useState('all');
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -36,13 +38,22 @@ const AdminProductManagementPage = () => {
 
   // Phê duyệt sản phẩm
   const handleApprove = (productId) => {
-    const updatedProducts = allProducts.map(product => 
-      product.id === productId 
-        ? { ...product, status: 'approved', reviewedAt: new Date().toISOString() }
-        : product
+    const product = allProducts.find(p => p.id === productId);
+    const updatedProducts = allProducts.map(p => 
+      p.id === productId 
+        ? { ...p, status: 'approved', reviewedAt: new Date().toISOString() }
+        : p
     );
     setProducts(updatedProducts);
     showSuccess('Sản phẩm đã được phê duyệt!');
+    if (product) {
+      addNotification({
+        title: 'Sản phẩm được duyệt',
+        message: `"${product.name}" của shop ${getShopName(product.shopId)} đã được admin phê duyệt.`,
+        type: 'product',
+        priority: 'normal'
+      }, ['shop']);
+    }
   };
 
   // Từ chối sản phẩm
@@ -64,6 +75,12 @@ const AdminProductManagementPage = () => {
     );
     setProducts(updatedProducts);
     showSuccess('Sản phẩm đã bị từ chối!');
+    addNotification({
+      title: 'Sản phẩm bị từ chối',
+      message: `"${selectedProduct.name}" của shop ${getShopName(selectedProduct.shopId)} đã bị từ chối: ${rejectionReason.trim()}`,
+      type: 'product',
+      priority: 'normal'
+    }, ['shop']);
     setIsModalOpen(false);
     setSelectedProduct(null);
     setRejectionReason('');

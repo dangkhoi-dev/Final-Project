@@ -75,7 +75,9 @@ const ProductDetailPage = () => {
                     fontWeight: '600',
                     cursor: 'pointer',
                     transition: 'all 0.3s ease',
-                    boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3)'
+                    boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3)',
+                    marginTop: '10px',
+                    marginBottom: '10px'
                   }}
                   onMouseOver={(e) => {
                     e.target.style.transform = 'translateY(-2px)';

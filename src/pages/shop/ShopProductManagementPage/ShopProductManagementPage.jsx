@@ -260,6 +260,63 @@ const ShopProductManagementPage = () => {
           </button>
         </div>
       )}
+
+      {/* Edit Product Modal */}
+      {editingProduct && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex justify-center items-center">
+          <div className="relative bg-white w-full max-w-lg mx-auto rounded-lg shadow-lg p-6">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">✏️ Chỉnh sửa sản phẩm</h2>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tên sản phẩm</label>
+                <input
+                  type="text"
+                  value={editingProduct.name}
+                  onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })}
+                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500"
+                  placeholder="Nhập tên sản phẩm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Giá (VND)</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="1000"
+                  value={editingProduct.price}
+                  onChange={(e) => setEditingProduct({ ...editingProduct, price: parseFloat(e.target.value || 0) })}
+                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500"
+                  placeholder="0"
+                />
+                <p className="text-xs text-gray-500 mt-1">Lưu ý: Sau khi lưu, sản phẩm sẽ chuyển về trạng thái Chờ duyệt.</p>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => setEditingProduct(null)}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md border border-gray-300 hover:bg-gray-200"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={() => handleUpdateProduct(editingProduct)}
+                className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+              >
+                Lưu thay đổi
+              </button>
+            </div>
+
+            <button
+              onClick={() => setEditingProduct(null)}
+              className="absolute top-3 right-4 text-gray-500 hover:text-gray-800 text-2xl"
+            >
+              &times;
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
