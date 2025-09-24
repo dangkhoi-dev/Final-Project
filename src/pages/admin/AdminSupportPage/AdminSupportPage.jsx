@@ -1,76 +1,14 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useAppContext } from '../../../contexts/AppContext';
 import { useNotification } from '../../../contexts/NotificationContext';
+import { useNotificationBell } from '../../../contexts/NotificationBellContext';
 
 const AdminSupportPage = () => {
-  const { users, shops } = useAppContext();
+  const { users, shops, supportRequests, setSupportRequests } = useAppContext();
+  const { addNotification } = useNotificationBell();
   const { showSuccess, showError } = useNotification();
   
   const [selectedTab, setSelectedTab] = useState('tickets');
-  const [supportTickets, setSupportTickets] = useState([
-    {
-      id: 1,
-      title: 'Không thể đăng nhập vào hệ thống',
-      description: 'Tôi đã thử đăng nhập nhiều lần nhưng hệ thống báo lỗi "Email hoặc mật khẩu không đúng"',
-      user: 'Nguyễn Văn A',
-      userEmail: 'nguyenvana@example.com',
-      userRole: 'customer',
-      status: 'open',
-      priority: 'high',
-      category: 'login',
-      createdAt: '2025-01-21T09:00:00Z',
-      updatedAt: '2025-01-21T09:00:00Z',
-      responses: []
-    },
-    {
-      id: 2,
-      title: 'Không thể tải lên hình ảnh sản phẩm',
-      description: 'Khi tôi cố gắng tải lên hình ảnh sản phẩm mới, hệ thống báo lỗi và không thể upload được',
-      user: 'Trần Thị B',
-      userEmail: 'tranthib@example.com',
-      userRole: 'shop',
-      status: 'in_progress',
-      priority: 'normal',
-      category: 'upload',
-      createdAt: '2025-01-20T14:30:00Z',
-      updatedAt: '2025-01-21T10:15:00Z',
-      responses: [
-        {
-          id: 1,
-          message: 'Chúng tôi đang kiểm tra vấn đề này. Vui lòng thử lại sau 30 phút.',
-          admin: 'Admin System',
-          createdAt: '2025-01-21T10:15:00Z'
-        }
-      ]
-    },
-    {
-      id: 3,
-      title: 'Yêu cầu reset mật khẩu',
-      description: 'Tôi quên mật khẩu và cần được hỗ trợ reset',
-      user: 'Lê Văn C',
-      userEmail: 'levanc@example.com',
-      userRole: 'customer',
-      status: 'resolved',
-      priority: 'low',
-      category: 'password',
-      createdAt: '2025-01-19T16:45:00Z',
-      updatedAt: '2025-01-20T08:30:00Z',
-      responses: [
-        {
-          id: 1,
-          message: 'Chúng tôi đã gửi link reset mật khẩu đến email của bạn.',
-          admin: 'Admin System',
-          createdAt: '2025-01-19T17:00:00Z'
-        },
-        {
-          id: 2,
-          message: 'Cảm ơn bạn đã xác nhận. Ticket này đã được đóng.',
-          admin: 'Admin System',
-          createdAt: '2025-01-20T08:30:00Z'
-        }
-      ]
-    }
-  ]);
 
   const [newResponse, setNewResponse] = useState('');
   const [selectedTicket, setSelectedTicket] = useState(null);
@@ -138,7 +76,7 @@ const AdminSupportPage = () => {
   };
 
   const handleStatusChange = (ticketId, newStatus) => {
-    setSupportTickets(prev => prev.map(ticket => 
+    setSupportRequests(prev => prev.map(ticket => 
       ticket.id === ticketId 
         ? { ...ticket, status: newStatus, updatedAt: new Date().toISOString() }
         : ticket
@@ -159,11 +97,11 @@ const AdminSupportPage = () => {
       createdAt: new Date().toISOString()
     };
 
-    setSupportTickets(prev => prev.map(ticket => 
+    setSupportRequests(prev => prev.map(ticket => 
       ticket.id === ticketId 
         ? { 
             ...ticket, 
-            responses: [...ticket.responses, response],
+            responses: [...(ticket.responses || []), response],
             updatedAt: new Date().toISOString()
           }
         : ticket
@@ -171,13 +109,46 @@ const AdminSupportPage = () => {
 
     setNewResponse('');
     showSuccess('Đã gửi phản hồi thành công!');
+
+    // Gửi notification tới đúng role (shop hoặc customer)
+    const targetTicket = supportRequests.find(t => t.id === ticketId);
+    if (targetTicket) {
+      const targetRole = targetTicket.fromRole === 'shop' ? 'shop' : 'customer';
+      addNotification({
+        title: 'Phản hồi hỗ trợ từ Admin',
+        message: `Ticket #${ticketId}: ${newResponse.substring(0, 60)}${newResponse.length > 60 ? '…' : ''}`,
+        type: 'system',
+        priority: 'normal'
+      }, [targetRole]);
+    }
   };
 
+  const enrichedTickets = useMemo(() => {
+    return supportRequests.map((t) => {
+      const user = users.find(u => u.id === t.userId);
+      const shop = shops.find(s => s.id === t.userId);
+      return {
+        id: t.id,
+        title: t.subject,
+        description: t.message,
+        user: user?.email?.split('@')[0] || shop?.name || t.email,
+        userEmail: t.email,
+        userRole: t.fromRole || 'customer',
+        status: t.status || 'open',
+        priority: 'normal',
+        category: t.category || 'other',
+        createdAt: t.createdAt,
+        updatedAt: t.updatedAt || t.createdAt,
+        responses: t.responses || []
+      };
+    });
+  }, [supportRequests, users, shops]);
+
   const stats = {
-    totalTickets: supportTickets.length,
-    openTickets: supportTickets.filter(t => t.status === 'open').length,
-    inProgressTickets: supportTickets.filter(t => t.status === 'in_progress').length,
-    resolvedTickets: supportTickets.filter(t => t.status === 'resolved').length
+    totalTickets: enrichedTickets.length,
+    openTickets: enrichedTickets.filter(t => t.status === 'open').length,
+    inProgressTickets: enrichedTickets.filter(t => t.status === 'in_progress').length,
+    resolvedTickets: enrichedTickets.filter(t => t.status === 'resolved').length
   };
 
   return (
@@ -305,7 +276,7 @@ const AdminSupportPage = () => {
             </h2>
 
             <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
-              {supportTickets.map((ticket) => (
+              {enrichedTickets.map((ticket) => (
                 <div
                   key={ticket.id}
                   style={{

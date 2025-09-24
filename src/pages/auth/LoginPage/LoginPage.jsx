@@ -8,10 +8,16 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const { handleLogin } = useAppContext();
+  const [error, setError] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    handleLogin(email, password);
+    const result = handleLogin(email, password);
+    if (result && result.ok === false) {
+      setError(result.message || 'Đăng nhập không thành công.');
+    } else {
+      setError('');
+    }
   };
 
   return (
@@ -72,6 +78,19 @@ const LoginPage = () => {
         {/* Form */}
         <div style={{ padding: '40px 30px' }}>
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {error && (
+              <div style={{
+                background: '#fef2f2',
+                border: '1px solid #fecaca',
+                color: '#dc2626',
+                padding: '10px 12px',
+                borderRadius: '10px',
+                fontSize: '14px',
+                fontWeight: 600
+              }}>
+                {error}
+              </div>
+            )}
             {/* Email Input */}
             <div style={{ position: 'relative' }}>
               <label style={{

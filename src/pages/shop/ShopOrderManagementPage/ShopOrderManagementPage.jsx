@@ -178,7 +178,7 @@ const ShopOrderManagementPage = () => {
               const shopTotal = calculateShopTotal(order);
               
               return (
-                <tr key={order.id} style={{ borderBottom: '1px solid #e5e7eb' }}
+                <tr key={order.id} style={{ borderBottom: '1px solid #e5e7eb', position: 'relative' }}
                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#eff6ff'}
                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
                   <td style={{ padding: '12px 24px', color: '#1f2937' }}>
@@ -213,10 +213,11 @@ const ShopOrderManagementPage = () => {
                     </span>
                   </td>
                   <td style={{ padding: '12px 24px', textAlign: 'center', color: '#1f2937' }}>
-                    {new Date(order.orderDate).toLocaleDateString('vi-VN')}
+                    {new Date(order.date || order.orderDate).toLocaleDateString('vi-VN')}
                   </td>
                   <td style={{ padding: '12px 24px', textAlign: 'center', color: '#1f2937' }}>
                     <button
+                      type="button"
                       onClick={() => setSelectedOrder(order)}
                       style={{
                         backgroundColor: '#3b82f6',
@@ -228,8 +229,8 @@ const ShopOrderManagementPage = () => {
                         border: 'none',
                         cursor: 'pointer'
                       }}
-                      onMouseEnter={(e) => e.target.style.backgroundColor = '#2563eb'}
-                      onMouseLeave={(e) => e.target.style.backgroundColor = '#3b82f6'}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2563eb'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#3b82f6'}
                     >
                       👁️ Xem
                     </button>
@@ -257,6 +258,54 @@ const ShopOrderManagementPage = () => {
               Chi tiết đơn hàng #{selectedOrder.id}
             </h2>
             
+            {/* Quick Confirm Panel for Pending Orders */}
+            {selectedOrder.status === 'pending' && (
+              <div style={{
+                background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
+                border: '2px solid #93c5fd',
+                borderRadius: '12px',
+                padding: '16px',
+                marginBottom: '16px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
+                  <div style={{ color: '#1e40af', fontWeight: 700, fontSize: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span>✅</span>
+                    Đơn hàng đang chờ xác nhận của shop
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      onClick={() => handleUpdateOrderStatus(selectedOrder.id, 'confirmed')}
+                      style={{
+                        padding: '10px 14px',
+                        background: '#2563eb',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontWeight: 600,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      ✅ Xác nhận đơn hàng
+                    </button>
+                    <button
+                      onClick={() => handleCancelOrder(selectedOrder.id)}
+                      style={{
+                        padding: '10px 14px',
+                        background: '#dc2626',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontWeight: 600,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      ❌ Hủy đơn
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="space-y-6">
               {/* Customer Info */}
               <div style={{

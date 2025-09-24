@@ -815,6 +815,27 @@ const Header = () => {
                     >
                       📈 Phân tích Sản phẩm
                     </Link>
+                    <Link 
+                      to="/shop/support" 
+                      onClick={() => setIsDropdownOpen(false)}
+                      style={{
+                        display: 'block',
+                        padding: '12px 16px',
+                        color: '#374151',
+                        textDecoration: 'none',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseOver={(e) => {
+                        e.target.style.background = '#f8fafc';
+                        e.target.style.color = '#1e40af';
+                      }}
+                      onMouseOut={(e) => {
+                        e.target.style.background = 'transparent';
+                        e.target.style.color = '#374151';
+                      }}
+                    >
+                      🆘 Hỗ trợ Shop
+                    </Link>
                   </>
                 )}
                 

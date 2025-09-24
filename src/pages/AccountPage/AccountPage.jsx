@@ -11,6 +11,18 @@ const AccountPage = () => {
   const [phone, setPhone] = useState(currentUser.phone || '');
   const [address, setAddress] = useState(currentUser.address || '');
 
+  const getStatusText = (status) => {
+    switch (status) {
+      case 'pending': return 'Chờ xác nhận';
+      case 'confirmed': return 'Đã xác nhận';
+      case 'shipped': return 'Đã giao hàng';
+      case 'delivered': return 'Đã nhận hàng';
+      case 'cancelled': return 'Đã hủy';
+      case 'refunded': return 'Đã hoàn tiền';
+      default: return 'Không xác định';
+    }
+  };
+
   return (
     <div className="account-container">
       <h1 className="account-title">Tài khoản của tôi</h1>
@@ -52,7 +64,7 @@ const AccountPage = () => {
                 </div>
                 <p className="order-total">Tổng tiền: {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.total)}</p>
                 <div className="order-statuses">
-                  <span className="status-pill">Trạng thái: {order.status}</span>
+                  <span className="status-pill">Trạng thái: {getStatusText(order.status)}</span>
                   <div className="status-times">
                     <div>Thanh toán: {order.paymentDate ? new Date(order.paymentDate).toLocaleString('vi-VN') : '—'}</div>
                     <div>Xác nhận: {order.confirmedDate ? new Date(order.confirmedDate).toLocaleString('vi-VN') : '—'}</div>

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useNotificationBell } from './NotificationBellContext';
 import { useNavigate } from 'react-router-dom';
 import { useNotification } from './NotificationContext';
 import { initialProducts, initialUsers, initialShops, initialOrders, initialPayments, initialReviews } from '../data/mockData';
@@ -16,6 +17,7 @@ export const useAppContext = () => {
 export const AppProvider = ({ children }) => {
   const navigate = useNavigate();
   const { showSuccess, showError, showWarning } = useNotification();
+  const { addNotification } = useNotificationBell();
   
   // State - Reset localStorage để đảm bảo dữ liệu mới
   const [products, setProducts] = useState(() => {
@@ -225,40 +227,78 @@ export const AppProvider = ({ children }) => {
     setOrders([...orders, newOrder]);
     setPayments([...payments, ...newPayments]);
     setCart([]);
-    
+
+    // Gửi thông báo đến role shop về đơn mới
+    addNotification({
+      title: 'Đơn hàng mới',
+      message: `Bạn có đơn hàng #${newOrder.id} cần xác nhận`,
+      type: 'order',
+      priority: 'high'
+    }, ['shop']);
+
     showSuccess(`Đặt hàng thành công! Mã đơn hàng: #${newOrder.id}. Shop sẽ xác nhận và giao hàng trong 24h.`);
     navigate('/account');
   };
 
   // Auth functions
   const handleRegister = (email, password) => {
-    if (users.find(user => user.email === email)) {
-      showError("Email đã tồn tại!");
-      return;
+    const normalizedEmail = (email || '').trim().toLowerCase();
+    const normalizedPassword = (password || '').trim();
+
+    if (!normalizedEmail || !normalizedPassword) {
+      const msg = "Vui lòng nhập đầy đủ Email và Mật khẩu!";
+      showError(msg);
+      return { ok: false, message: msg };
     }
-    const newUser = { id: Date.now(), email, password, role: 'customer' };
+
+    if (users.find(user => (user.email || '').toLowerCase() === normalizedEmail)) {
+      const msg = "Email đã tồn tại!";
+      showError(msg);
+      return { ok: false, message: msg };
+    }
+    const newUser = { id: Date.now(), email: normalizedEmail, password: normalizedPassword, role: 'customer' };
     setUsers([...users, newUser]);
     showSuccess("Đăng ký thành công! Vui lòng đăng nhập.");
     navigate('/login');
+    return { ok: true };
   };
 
   const handleLogin = (email, password) => {
-    const user = users.find(u => u.email === email && u.password === password);
-    if (user) {
-      setCurrentUser(user);
-      
-      // Clear giỏ hàng nếu đăng nhập với role khác customer
-      if (user.role !== 'customer') {
-        setCart([]);
-      }
-      
-      showSuccess(`Chào mừng ${user.email}!`);
-      if (user.role === 'admin') navigate('/admin/dashboard');
-      else if (user.role === 'shop') navigate('/shop/dashboard');
-      else navigate('/');
-    } else {
-      showError("Email hoặc mật khẩu không đúng.");
+    const normalizedEmail = (email || '').trim().toLowerCase();
+    const normalizedPassword = (password || '').trim();
+
+    if (!normalizedEmail || !normalizedPassword) {
+      const msg = "Vui lòng nhập email và mật khẩu.";
+      showError(msg);
+      return { ok: false, message: msg };
     }
+
+    const userByEmail = users.find(u => (u.email || '').toLowerCase() === normalizedEmail);
+
+    if (!userByEmail) {
+      const msg = "Tài khoản không tồn tại. Vui lòng đăng ký hoặc kiểm tra lại email.";
+      showError(msg);
+      return { ok: false, message: msg };
+    }
+
+    if (userByEmail.password !== normalizedPassword) {
+      const msg = "Mật khẩu không đúng. Vui lòng thử lại.";
+      showError(msg);
+      return { ok: false, message: msg };
+    }
+
+    setCurrentUser(userByEmail);
+
+    // Clear giỏ hàng nếu đăng nhập với role khác customer
+    if (userByEmail.role !== 'customer') {
+      setCart([]);
+    }
+
+    showSuccess(`Chào mừng ${userByEmail.email}!`);
+    if (userByEmail.role === 'admin') navigate('/admin/dashboard');
+    else if (userByEmail.role === 'shop') navigate('/shop/dashboard');
+    else navigate('/');
+    return { ok: true };
   };
 
   const handleLogout = () => {

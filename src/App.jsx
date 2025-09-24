@@ -35,6 +35,7 @@ import ShopReviewManagementPage from './pages/shop/ShopReviewManagementPage/Shop
 import ShopReportsPage from './pages/shop/ShopReportsPage/ShopReportsPage';
 import ShopCustomerManagementPage from './pages/shop/ShopCustomerManagementPage/ShopCustomerManagementPage';
 import ShopProductAnalyticsPage from './pages/shop/ShopProductAnalyticsPage/ShopProductAnalyticsPage';
+import ShopSupportPage from './pages/shop/ShopSupportPage/ShopSupportPage';
 import NotificationDemo from './components/NotificationDemo';
 import CustomerPromotionsPage from './pages/customer/CustomerPromotionsPage/CustomerPromotionsPage';
 import CustomerPaymentsPage from './pages/customer/CustomerPaymentsPage/CustomerPaymentsPage';
@@ -178,6 +179,11 @@ const AppContent = () => {
                 <Route path="/shop/reports" element={
                   <ProtectedRoute requiredRole="shop">
                     <ShopReportsPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/shop/support" element={
+                  <ProtectedRoute requiredRole="shop">
+                    <ShopSupportPage />
                   </ProtectedRoute>
                 } />
                 <Route path="/shop/customers" element={

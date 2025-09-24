@@ -6,6 +6,7 @@ const CustomerPromotionsPage = () => {
   const { promotions } = useAppContext();
   const [statusFilter, setStatusFilter] = useState('active');
   const [search, setSearch] = useState('');
+  const [showMobilePanel, setShowMobilePanel] = useState(false);
 
     const stats = useMemo(() => ({
     total: promotions.length,
@@ -71,7 +72,16 @@ const CustomerPromotionsPage = () => {
       </div>
 
       <div className="cp-toolbar">
-        <div className="cp-search">
+        <button
+          type="button"
+          className="cp-mobile-toggle"
+          onClick={() => setShowMobilePanel(!showMobilePanel)}
+        >
+          ☰ Bộ lọc & Tìm kiếm
+          <span className="cp-result-badge">{filtered.length}</span>
+        </button>
+
+        <div className="cp-desktop-controls cp-search">
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -85,7 +95,7 @@ const CustomerPromotionsPage = () => {
           )}
           <div className="cp-hint">Gõ để tìm nhanh khuyến mãi phù hợp</div>
         </div>
-        <div className="cp-filters">
+        <div className="cp-desktop-controls cp-filters">
           {[
             { key: 'active', label: 'Đang hoạt động', count: stats.active },
             { key: 'scheduled', label: 'Đã lên lịch', count: stats.scheduled },
@@ -102,9 +112,42 @@ const CustomerPromotionsPage = () => {
             </button>
           ))}
         </div>
-        <div className="cp-result">
+        <div className="cp-desktop-controls cp-result">
           <span className="cp-result-label">Kết quả:</span>
           <span className="cp-result-badge">{filtered.length}</span>
+        </div>
+        <div className={`cp-mobile-panel ${showMobilePanel ? 'open' : ''}`}>
+          <div className="cp-search">
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Tìm theo tên hoặc mô tả khuyến mãi..."
+              aria-label="Tìm khuyến mãi"
+              className="cp-search-input"
+            />
+            <span className="cp-search-icon">🔍</span>
+            {search && (
+              <button type="button" onClick={() => setSearch('')} className="cp-clear-btn" aria-label="Xóa tìm kiếm" title="Xóa">✕</button>
+            )}
+            <div className="cp-hint">Gõ để tìm nhanh khuyến mãi phù hợp</div>
+          </div>
+          <div className="cp-filters">
+            {[
+              { key: 'active', label: 'Đang hoạt động', count: stats.active },
+              { key: 'scheduled', label: 'Đã lên lịch', count: stats.scheduled },
+              { key: 'expired', label: 'Đã hết hạn', count: stats.expired },
+              { key: 'all', label: 'Tất cả', count: stats.total },
+            ].map(f => (
+              <button
+                key={f.key}
+                onClick={() => { setStatusFilter(f.key); setShowMobilePanel(false); }}
+                className={`cp-filter-btn ${statusFilter === f.key ? 'cp-filter-btn--active' : ''}`}
+              >
+                <span>{f.label}</span>
+                <span className="cp-filter-count">{f.count}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
