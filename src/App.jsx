@@ -36,6 +36,9 @@ import ShopReportsPage from './pages/shop/ShopReportsPage/ShopReportsPage';
 import ShopCustomerManagementPage from './pages/shop/ShopCustomerManagementPage/ShopCustomerManagementPage';
 import ShopProductAnalyticsPage from './pages/shop/ShopProductAnalyticsPage/ShopProductAnalyticsPage';
 import NotificationDemo from './components/NotificationDemo';
+import CustomerPromotionsPage from './pages/customer/CustomerPromotionsPage/CustomerPromotionsPage';
+import CustomerPaymentsPage from './pages/customer/CustomerPaymentsPage/CustomerPaymentsPage';
+import CustomerSupportPage from './pages/customer/CustomerSupportPage/CustomerSupportPage';
 
 const AppContent = () => {
   return (
@@ -55,6 +58,17 @@ const AppContent = () => {
           <Route path="/account" element={
             <ProtectedRoute requiredRole="customer">
               <AccountPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/promotions" element={<CustomerPromotionsPage />} />
+          <Route path="/my/payments" element={
+            <ProtectedRoute requiredRole="customer">
+              <CustomerPaymentsPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/support" element={
+            <ProtectedRoute requiredRole="customer">
+              <CustomerSupportPage />
             </ProtectedRoute>
           } />
           

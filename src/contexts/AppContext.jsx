@@ -42,6 +42,41 @@ export const AppProvider = ({ children }) => {
   const [reviews, setReviews] = useState(() => JSON.parse(localStorage.getItem('reviews')) || initialReviews);
   const [cart, setCart] = useState(() => JSON.parse(localStorage.getItem('cart')) || []);
   const [currentUser, setCurrentUser] = useState(() => JSON.parse(sessionStorage.getItem('currentUser')) || null);
+  const [promotions, setPromotions] = useState(() => JSON.parse(localStorage.getItem('promotions')) || [
+    {
+      id: 1,
+      name: 'Giảm giá 20% thời trang nam',
+      description: 'Áp dụng cho tất cả sản phẩm thời trang nam',
+      type: 'percentage',
+      value: 20,
+      minOrderValue: 500000,
+      maxDiscount: 200000,
+      startDate: '2025-09-20T00:00:00Z',
+      endDate: '2025-09-30T23:59:59Z',
+      status: 'active',
+      usageCount: 45,
+      maxUsage: 100,
+      applicableProducts: ['Thời trang nam'],
+      applicableUsers: 'all'
+    },
+    {
+      id: 2,
+      name: 'Freeship cho đơn hàng từ 300k',
+      description: 'Miễn phí vận chuyển cho đơn hàng từ 300.000 VND',
+      type: 'freeship',
+      value: 0,
+      minOrderValue: 300000,
+      maxDiscount: 50000,
+      startDate: '2025-09-15T00:00:00Z',
+      endDate: '2025-10-15T23:59:59Z',
+      status: 'active',
+      usageCount: 78,
+      maxUsage: 200,
+      applicableProducts: ['all'],
+      applicableUsers: 'all'
+    }
+  ]);
+  const [supportRequests, setSupportRequests] = useState(() => JSON.parse(localStorage.getItem('supportRequests')) || []);
 
   // Persist data to localStorage
   useEffect(() => localStorage.setItem('products', JSON.stringify(products)), [products]);
@@ -52,6 +87,8 @@ export const AppProvider = ({ children }) => {
   useEffect(() => localStorage.setItem('reviews', JSON.stringify(reviews)), [reviews]);
   useEffect(() => localStorage.setItem('cart', JSON.stringify(cart)), [cart]);
   useEffect(() => sessionStorage.setItem('currentUser', JSON.stringify(currentUser)), [currentUser]);
+  useEffect(() => localStorage.setItem('promotions', JSON.stringify(promotions)), [promotions]);
+  useEffect(() => localStorage.setItem('supportRequests', JSON.stringify(supportRequests)), [supportRequests]);
 
   // Navigation function
   const navigateTo = (path) => {
@@ -231,6 +268,30 @@ export const AppProvider = ({ children }) => {
     navigate('/');
   };
 
+  // Customer profile update
+  const updateProfile = (profileUpdates) => {
+    if (!currentUser) return;
+    const updatedUser = { ...currentUser, ...profileUpdates };
+    setCurrentUser(updatedUser);
+    setUsers(prev => prev.map(u => u.id === updatedUser.id ? updatedUser : u));
+    showSuccess('Cập nhật thông tin tài khoản thành công!');
+  };
+
+  // Customer support
+  const submitSupportRequest = (request) => {
+    if (!currentUser) return;
+    const newRequest = {
+      id: Date.now(),
+      userId: currentUser.id,
+      email: currentUser.email,
+      status: 'open',
+      createdAt: new Date().toISOString(),
+      ...request
+    };
+    setSupportRequests(prev => [newRequest, ...prev]);
+    showSuccess('Yêu cầu hỗ trợ đã được gửi. Chúng tôi sẽ phản hồi sớm!');
+  };
+
   // Protected route check
   const isAdmin = () => currentUser && currentUser.role === 'admin';
   const isShop = () => currentUser && currentUser.role === 'shop';
@@ -269,6 +330,10 @@ export const AppProvider = ({ children }) => {
     setPayments,
     reviews,
     setReviews,
+    promotions,
+    setPromotions,
+    supportRequests,
+    setSupportRequests,
     cart,
     setCart,
     currentUser,
@@ -285,6 +350,8 @@ export const AppProvider = ({ children }) => {
     handleLogin,
     handleLogout,
     addProduct, // New function for shop
+    updateProfile,
+    submitSupportRequest,
     
     // Auth checks
     isAdmin,

@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAppContext } from '../../contexts/AppContext';
 import './AccountPage.css';
 
 const AccountPage = () => {
-  const { currentUser, orders } = useAppContext();
+  const { currentUser, orders, updateProfile } = useAppContext();
   if (!currentUser) return <p>Vui lòng đăng nhập.</p>;
 
   const userOrders = orders.filter(order => order.userId === currentUser.id);
+  const [name, setName] = useState(currentUser.name || '');
+  const [phone, setPhone] = useState(currentUser.phone || '');
+  const [address, setAddress] = useState(currentUser.address || '');
 
   return (
     <div className="account-container">
@@ -14,6 +17,26 @@ const AccountPage = () => {
       <div className="account-info-section">
         <h2 className="section-title">Thông tin cá nhân</h2>
         <p className="user-info"><strong>Email:</strong> {currentUser.email}</p>
+        <div className="user-edit-form">
+          <div className="form-row">
+            <label>Họ và tên</label>
+            <input value={name} onChange={(e) => setName(e.target.value)} />
+          </div>
+          <div className="form-row">
+            <label>Số điện thoại</label>
+            <input value={phone} onChange={(e) => setPhone(e.target.value)} />
+          </div>
+          <div className="form-row">
+            <label>Địa chỉ</label>
+            <input value={address} onChange={(e) => setAddress(e.target.value)} />
+          </div>
+          <button
+            onClick={() => updateProfile({ name, phone, address })}
+            className="save-profile-btn"
+          >
+            Lưu thay đổi
+          </button>
+        </div>
       </div>
       <div className="account-orders-section">
         <h2 className="section-title">Lịch sử đơn hàng</h2>
@@ -28,6 +51,16 @@ const AccountPage = () => {
                   <p className="order-date">Ngày đặt: {new Date(order.date).toLocaleDateString('vi-VN')}</p>
                 </div>
                 <p className="order-total">Tổng tiền: {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.total)}</p>
+                <div className="order-statuses">
+                  <span className="status-pill">Trạng thái: {order.status}</span>
+                  <div className="status-times">
+                    <div>Thanh toán: {order.paymentDate ? new Date(order.paymentDate).toLocaleString('vi-VN') : '—'}</div>
+                    <div>Xác nhận: {order.confirmedDate ? new Date(order.confirmedDate).toLocaleString('vi-VN') : '—'}</div>
+                    <div>Giao hàng: {order.shippedDate ? new Date(order.shippedDate).toLocaleString('vi-VN') : '—'}</div>
+                    <div>Giao thành công: {order.deliveredDate ? new Date(order.deliveredDate).toLocaleString('vi-VN') : '—'}</div>
+                    <div>Ước tính giao: {order.estimatedDelivery ? new Date(order.estimatedDelivery).toLocaleString('vi-VN') : '—'}</div>
+                  </div>
+                </div>
                 <ul className="order-items">
                   {order.items.map(item => (
                     <li key={item.id} className="order-item-detail">{item.name} (x{item.quantity})</li>

@@ -145,6 +145,27 @@ const Header = () => {
           >
             Sản phẩm
           </Link>
+          <Link 
+            to="/promotions" 
+            style={{
+              color: 'rgba(255, 255, 255, 0.9)',
+              textDecoration: 'none',
+              fontWeight: '500',
+              padding: '8px 16px',
+              borderRadius: '8px',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseOver={(e) => {
+              e.target.style.background = 'rgba(255, 255, 255, 0.1)';
+              e.target.style.color = 'white';
+            }}
+            onMouseOut={(e) => {
+              e.target.style.background = 'transparent';
+              e.target.style.color = 'rgba(255, 255, 255, 0.9)';
+            }}
+          >
+            Khuyến mãi
+          </Link>
           
           {/* Notification Bell */}
           {currentUser && (
@@ -594,6 +615,52 @@ const Header = () => {
                   >
                     👤 Tài khoản
                   </Link>
+                )}
+                {currentUser.role === 'customer' && (
+                  <>
+                    <Link 
+                      to="/my/payments" 
+                      onClick={() => setIsDropdownOpen(false)}
+                      style={{
+                        display: 'block',
+                        padding: '12px 16px',
+                        color: '#374151',
+                        textDecoration: 'none',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseOver={(e) => {
+                        e.target.style.background = '#f8fafc';
+                        e.target.style.color = '#1e40af';
+                      }}
+                      onMouseOut={(e) => {
+                        e.target.style.background = 'transparent';
+                        e.target.style.color = '#374151';
+                      }}
+                    >
+                      💳 Thanh toán của tôi
+                    </Link>
+                    <Link 
+                      to="/support" 
+                      onClick={() => setIsDropdownOpen(false)}
+                      style={{
+                        display: 'block',
+                        padding: '12px 16px',
+                        color: '#374151',
+                        textDecoration: 'none',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseOver={(e) => {
+                        e.target.style.background = '#f8fafc';
+                        e.target.style.color = '#1e40af';
+                      }}
+                      onMouseOut={(e) => {
+                        e.target.style.background = 'transparent';
+                        e.target.style.color = '#374151';
+                      }}
+                    >
+                      🆘 Hỗ trợ
+                    </Link>
+                  </>
                 )}
                 
                 {currentUser.role === 'admin' && (
